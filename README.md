@@ -1,2 +1,2 @@
 # EconomyAPI
-EconomyAPI by @onebone, but for PocketMine 4.0.0
+EconomyAPI by @onebone, Dev
