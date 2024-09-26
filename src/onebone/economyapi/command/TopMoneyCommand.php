@@ -26,11 +26,13 @@ use pocketmine\command\CommandSender;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\task\SortTask;
 
-class TopMoneyCommand extends Command{
+class TopMoneyCommand extends Command
+{
 	/** @var EconomyAPI */
 	private $plugin;
 
-	public function __construct(EconomyAPI $plugin){
+	public function __construct(EconomyAPI $plugin)
+	{
 		$desc = $plugin->getCommandMessage("topmoney");
 		parent::__construct("topmoney", $desc["description"], $desc["usage"]);
 
@@ -39,23 +41,24 @@ class TopMoneyCommand extends Command{
 		$this->plugin = $plugin;
 	}
 
-	public function execute(CommandSender $sender, string $label, array $params): bool{
-		if(!$this->plugin->isEnabled()) return false;
-		if(!$this->testPermission($sender)) return false;
+	public function execute(CommandSender $sender, string $label, array $params): bool
+	{
+		if (!$this->plugin->isEnabled()) return false;
+		if (!$this->testPermission($sender)) return false;
 
 		$page = (int)array_shift($params);
 
 		$server = $this->plugin->getServer();
 
 		$banned = [];
-		foreach($server->getNameBans()->getEntries() as $entry){
-			if($this->plugin->accountExists($entry->getName())){
+		foreach ($server->getNameBans()->getEntries() as $entry) {
+			if ($this->plugin->accountExists($entry->getName())) {
 				$banned[] = $entry->getName();
 			}
 		}
 		$ops = [];
-		foreach($server->getOps()->getAll() as $op){
-			if($this->plugin->accountExists($op)){
+		foreach ($server->getOps()->getAll() as $op) {
+			if ($this->plugin->accountExists($op)) {
 				$ops[] = $op;
 			}
 		}

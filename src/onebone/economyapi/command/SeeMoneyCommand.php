@@ -9,10 +9,12 @@ use pocketmine\player\Player;
 
 use onebone\economyapi\EconomyAPI;
 
-class SeeMoneyCommand extends Command{
+class SeeMoneyCommand extends Command
+{
 	private $plugin;
 
-	public function __construct(EconomyAPI $plugin){
+	public function __construct(EconomyAPI $plugin)
+	{
 		$desc = $plugin->getCommandMessage("seemoney");
 		parent::__construct("seemoney", $desc["description"], $desc["usage"]);
 
@@ -21,26 +23,27 @@ class SeeMoneyCommand extends Command{
 		$this->plugin = $plugin;
 	}
 
-	public function execute(CommandSender $sender, string $label, array $params): bool{
-		if(!$this->plugin->isEnabled()) return false;
-		if(!$this->testPermission($sender)){
+	public function execute(CommandSender $sender, string $label, array $params): bool
+	{
+		if (!$this->plugin->isEnabled()) return false;
+		if (!$this->testPermission($sender)) {
 			return false;
 		}
 
 		$player = array_shift($params);
-		if(trim($player) === ""){
+		if (trim($player) === "") {
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 			return true;
 		}
 
-		if(($p = $this->plugin->getServer()->getPlayerByPrefix($player)) instanceof Player){
+		if (($p = $this->plugin->getServer()->getPlayerByPrefix($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
 		$money = $this->plugin->myMoney($player);
-		if($money !== false){
+		if ($money !== false) {
 			$sender->sendMessage($this->plugin->getMessage("seemoney-seemoney", [$player, $money], $sender->getName()));
-		}else{
+		} else {
 			$sender->sendMessage($this->plugin->getMessage("player-never-connected", [$player], $sender->getName()));
 		}
 		return true;
