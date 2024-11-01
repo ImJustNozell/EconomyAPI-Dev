@@ -10,21 +10,19 @@ use onebone\economyapi\EconomyAPI;
 
 class SetLangCommand extends Command
 {
-	private $plugin;
 
-	public function __construct(EconomyAPI $plugin)
+	public function __construct()
 	{
-		$desc = $plugin->getCommandMessage("setlang");
+		$desc = EconomyAPI::getInstance()->getCommandMessage("setlang");
 		parent::__construct("setlang", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.setlang");
 
-		$this->plugin = $plugin;
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool
 	{
-		if (!$this->plugin->isEnabled()) return false;
+		if (!EconomyAPI::getInstance()->isEnabled()) return false;
 		if (!$this->testPermission($sender)) {
 			return false;
 		}
@@ -35,8 +33,8 @@ class SetLangCommand extends Command
 			return true;
 		}
 
-		if ($this->plugin->setPlayerLanguage($sender->getName(), $lang)) {
-			$sender->sendMessage($this->plugin->getMessage("language-set", [$lang], $sender->getName()));
+		if (EconomyAPI::getInstance()->setPlayerLanguage($sender->getName(), $lang)) {
+			$sender->sendMessage(EconomyAPI::getInstance()->getMessage("language-set", [$lang], $sender->getName()));
 		} else {
 			$sender->sendMessage(TextFormat::RED . "There is no language such as $lang");
 		}

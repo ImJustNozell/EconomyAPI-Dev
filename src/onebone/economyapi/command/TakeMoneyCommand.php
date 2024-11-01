@@ -11,21 +11,19 @@ use onebone\economyapi\EconomyAPI;
 
 class TakeMoneyCommand extends Command
 {
-	private $plugin;
 
-	public function __construct(EconomyAPI $plugin)
+	public function __construct()
 	{
-		$desc = $plugin->getCommandMessage("takemoney");
+		$desc = EconomyAPI::getInstance()->getCommandMessage("takemoney");
 		parent::__construct("takemoney", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.takemoney");
 
-		$this->plugin = $plugin;
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool
 	{
-		if (!$this->plugin->isEnabled()) return false;
+		if (!EconomyAPI::getInstance()->isEnabled()) return false;
 		if (!$this->testPermission($sender)) {
 			return false;
 		}
@@ -38,32 +36,32 @@ class TakeMoneyCommand extends Command
 			return true;
 		}
 
-		if (($p = $this->plugin->getServer()->getPlayerByPrefix($player)) instanceof Player) {
+		if (($p = EconomyAPI::getInstance()->getServer()->getPlayerByPrefix($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
 		if ($amount < 0) {
-			$sender->sendMessage($this->plugin->getMessage("takemoney-invalid-number", [$amount], $sender->getName()));
+			$sender->sendMessage(EconomyAPI::getInstance()->getMessage("takemoney-invalid-number", [$amount], $sender->getName()));
 			return true;
 		}
 
-		$result = $this->plugin->reduceMoney($player, $amount);
+		$result = EconomyAPI::getInstance()->reduceMoney($player, $amount);
 		switch ($result) {
 			case EconomyAPI::RET_INVALID:
-				$sender->sendMessage($this->plugin->getMessage("takemoney-player-lack-of-money", [$player, $amount, $this->plugin->myMoney($player)], $sender->getName()));
+				$sender->sendMessage(EconomyAPI::getInstance()->getMessage("takemoney-player-lack-of-money", [$player, $amount, EconomyAPI::getInstance()->myMoney($player)], $sender->getName()));
 				break;
 			case EconomyAPI::RET_SUCCESS:
-				$sender->sendMessage($this->plugin->getMessage("takemoney-took-money", [$player, $amount], $sender->getName()));
+				$sender->sendMessage(EconomyAPI::getInstance()->getMessage("takemoney-took-money", [$player, $amount], $sender->getName()));
 
 				if ($p instanceof Player) {
-					$p->sendMessage($this->plugin->getMessage("takemoney-money-taken", [$amount], $sender->getName()));
+					$p->sendMessage(EconomyAPI::getInstance()->getMessage("takemoney-money-taken", [$amount], $sender->getName()));
 				}
 				break;
 			case EconomyAPI::RET_CANCELLED:
-				$sender->sendMessage($this->plugin->getMessage("takemoney-failed", [], $sender->getName()));
+				$sender->sendMessage(EconomyAPI::getInstance()->getMessage("takemoney-failed", [], $sender->getName()));
 				break;
 			case EconomyAPI::RET_NO_ACCOUNT:
-				$sender->sendMessage($this->plugin->getMessage("player-never-connected", [$player], $sender->getName()));
+				$sender->sendMessage(EconomyAPI::getInstance()->getMessage("player-never-connected", [$player], $sender->getName()));
 				break;
 		}
 

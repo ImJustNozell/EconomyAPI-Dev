@@ -11,21 +11,19 @@ use onebone\economyapi\EconomyAPI;
 
 class SeeMoneyCommand extends Command
 {
-	private $plugin;
 
-	public function __construct(EconomyAPI $plugin)
+	public function __construct()
 	{
-		$desc = $plugin->getCommandMessage("seemoney");
+		$desc = EconomyAPI::getInstance()->getCommandMessage("seemoney");
 		parent::__construct("seemoney", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.seemoney");
 
-		$this->plugin = $plugin;
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool
 	{
-		if (!$this->plugin->isEnabled()) return false;
+		if (!EconomyAPI::getInstance()->isEnabled()) return false;
 		if (!$this->testPermission($sender)) {
 			return false;
 		}
@@ -36,15 +34,15 @@ class SeeMoneyCommand extends Command
 			return true;
 		}
 
-		if (($p = $this->plugin->getServer()->getPlayerByPrefix($player)) instanceof Player) {
+		if (($p = EconomyAPI::getInstance()->getServer()->getPlayerByPrefix($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
-		$money = $this->plugin->myMoney($player);
+		$money = EconomyAPI::getInstance()->myMoney($player);
 		if ($money !== false) {
-			$sender->sendMessage($this->plugin->getMessage("seemoney-seemoney", [$player, $money], $sender->getName()));
+			$sender->sendMessage(EconomyAPI::getInstance()->getMessage("seemoney-seemoney", [$player, $money], $sender->getName()));
 		} else {
-			$sender->sendMessage($this->plugin->getMessage("player-never-connected", [$player], $sender->getName()));
+			$sender->sendMessage(EconomyAPI::getInstance()->getMessage("player-never-connected", [$player], $sender->getName()));
 		}
 		return true;
 	}

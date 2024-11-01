@@ -12,21 +12,19 @@ use onebone\economyapi\event\money\PayMoneyEvent;
 
 class PayCommand extends Command
 {
-	private $plugin;
 
-	public function __construct(EconomyAPI $plugin)
+	public function __construct()
 	{
-		$desc = $plugin->getCommandMessage("pay");
+		$desc = EconomyAPI::getInstance()->getCommandMessage("pay");
 		parent::__construct("pay", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.pay");
 
-		$this->plugin = $plugin;
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool
 	{
-		if (!$this->plugin->isEnabled()) return false;
+		if (!EconomyAPI::getInstance()->isEnabled()) return false;
 		if (!$this->testPermission($sender)) {
 			return false;
 		}
@@ -44,37 +42,37 @@ class PayCommand extends Command
 			return true;
 		}
 
-		if (($p = $this->plugin->getServer()->getPlayerByPrefix($player)) instanceof Player) {
+		if (($p = EconomyAPI::getInstance()->getServer()->getPlayerByPrefix($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
-		if (!$p instanceof Player and $this->plugin->getConfig()->get("allow-pay-offline", true) === false) {
-			$sender->sendMessage($this->plugin->getMessage("player-not-connected", [$player], $sender->getName()));
+		if (!$p instanceof Player and EconomyAPI::getInstance()->getConfig()->get("allow-pay-offline", true) === false) {
+			$sender->sendMessage(EconomyAPI::getInstance()->getMessage("player-not-connected", [$player], $sender->getName()));
 			return true;
 		}
 
-		if (!$this->plugin->accountExists($player)) {
-			$sender->sendMessage($this->plugin->getMessage("player-never-connected", [$player], $sender->getName()));
+		if (!EconomyAPI::getInstance()->accountExists($player)) {
+			$sender->sendMessage(EconomyAPI::getInstance()->getMessage("player-never-connected", [$player], $sender->getName()));
 			return true;
 		}
 
-		$ev = new PayMoneyEvent($this->plugin, $sender->getName(), $player, $amount);
+		$ev = new PayMoneyEvent(EconomyAPI::getInstance(), $sender->getName(), $player, $amount);
 		$ev->call();
 
 		$result = EconomyAPI::RET_CANCELLED;
 		if (!$ev->isCancelled()) {
-			$result = $this->plugin->reduceMoney($sender, $amount);
+			$result = EconomyAPI::getInstance()->reduceMoney($sender, $amount);
 		}
 
 		if ($result === EconomyAPI::RET_SUCCESS) {
-			$this->plugin->addMoney($player, $amount, true);
+			EconomyAPI::getInstance()->addMoney($player, $amount, true);
 
-			$sender->sendMessage($this->plugin->getMessage("pay-success", [$amount, $player], $sender->getName()));
+			$sender->sendMessage(EconomyAPI::getInstance()->getMessage("pay-success", [$amount, $player], $sender->getName()));
 			if ($p instanceof Player) {
-				$p->sendMessage($this->plugin->getMessage("money-paid", [$sender->getName(), $amount], $sender->getName()));
+				$p->sendMessage(EconomyAPI::getInstance()->getMessage("money-paid", [$sender->getName(), $amount], $sender->getName()));
 			}
 		} else {
-			$sender->sendMessage($this->plugin->getMessage("pay-failed", [$player, $amount], $sender->getName()));
+			$sender->sendMessage(EconomyAPI::getInstance()->getMessage("pay-failed", [$player, $amount], $sender->getName()));
 		}
 		return true;
 	}

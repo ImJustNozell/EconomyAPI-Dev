@@ -11,21 +11,18 @@ use onebone\economyapi\EconomyAPI;
 
 class MyStatusCommand extends Command
 {
-	private $plugin;
 
-	public function __construct(EconomyAPI $plugin)
+	public function __construct()
 	{
-		$desc = $plugin->getCommandMessage("mystatus");
+		$desc = EconomyAPI::getInstance()->getCommandMessage("mystatus");
 		parent::__construct("mystatus", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.mystatus");
-
-		$this->plugin = $plugin;
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool
 	{
-		if (!$this->plugin->isEnabled()) return false;
+		if (!EconomyAPI::getInstance()->isEnabled()) return false;
 		if (!$this->testPermission($sender)) {
 			return false;
 		}
@@ -35,7 +32,7 @@ class MyStatusCommand extends Command
 			return true;
 		}
 
-		$money = $this->plugin->getAllMoney();
+		$money = EconomyAPI::getInstance()->getAllMoney();
 
 		$allMoney = 0;
 		foreach ($money as $m) {
@@ -46,7 +43,7 @@ class MyStatusCommand extends Command
 			$topMoney = round((($money[strtolower($sender->getName())] / $allMoney) * 100), 2);
 		}
 
-		$sender->sendMessage($this->plugin->getMessage("mystatus-show", [$topMoney], $sender->getName()));
+		$sender->sendMessage(EconomyAPI::getInstance()->getMessage("mystatus-show", [$topMoney], $sender->getName()));
 		return true;
 	}
 }
